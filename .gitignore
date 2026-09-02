@@ -1,0 +1,25 @@
+# Local environment and secrets
+.env
+.env.*
+!.env.example
+
+# Dependencies and generated files
+backend/vendor/
+backend/node_modules/
+backend/public/build/
+backend/public/hot
+backend/public/storage
+backend/storage/*.key
+backend/storage/logs/
+backend/storage/framework/
+backend/storage/app/private/
+backend/bootstrap/cache/*.php
+
+# Test and editor files
+.phpunit.result.cache
+.phpunit.cache/
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+*.log
