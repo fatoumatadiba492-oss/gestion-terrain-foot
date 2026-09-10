@@ -7,6 +7,7 @@ namespace App\Http\Controllers;
 use App\Models\Terrain;
 use App\Models\TerrainSlot;
 use Illuminate\Http\Request;
+use Illuminate\Validation\ValidationException;
 
 class TerrainSlotController extends Controller
 {
@@ -41,12 +42,18 @@ class TerrainSlotController extends Controller
     {
         $required = $partial ? 'sometimes' : 'required';
 
-        return $request->validate([
+        $data = $request->validate([
             'day_of_week' => [$required, 'integer', 'between:1,7'],
             'start_time' => [$required, 'date_format:H:i'],
             'end_time' => [$required, 'date_format:H:i'],
             'price' => [$required, 'integer', 'min:1', 'max:1000000'],
             'is_active' => ['sometimes', 'boolean'],
         ]);
+
+        if (isset($data['start_time'], $data['end_time']) && $data['start_time'] === $data['end_time']) {
+            throw ValidationException::withMessages(['end_time' => 'L’heure de fin doit être différente de l’heure de début.']);
+        }
+
+        return $data;
     }
 }
