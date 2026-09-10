@@ -1,4 +1,4 @@
-const API='http://127.0.0.1:8000/api';
+const API='http://127.0.0.1:8001/api';
 const TOKEN_KEY='terrain_admin_token';
 let terrains=[];
 const $=id=>document.getElementById(id);
