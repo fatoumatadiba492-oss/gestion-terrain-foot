@@ -1,5 +1,5 @@
 (() => {
-  const apiBase = window.BACKEND_URL || 'http://127.0.0.1:8000';
+  const apiBase = window.BACKEND_URL || 'http://127.0.0.1:8001';
   const bookingForm = document.querySelector('#bookingForm');
   const customSearchForm = document.querySelector('#customSearchForm');
   let terrains = [];
@@ -182,7 +182,6 @@
   function installHomepageMotionAndResponsive() {
     const style = document.createElement('style');
     style.textContent = `
-      /* Motion refinement: calm, short and intentional. */
       .reveal { transform: translateY(22px); transition: opacity .55s ease, transform .55s ease; }
       .reveal-left { transform: translateX(-28px); }
       .reveal-right { transform: translateX(28px); }
@@ -194,74 +193,67 @@
       @media (max-width: 900px) {
         .container, .hero-grid { width: min(100% - 32px, 1180px); }
         .nav { padding: 12px 0; }
-        .nav-inner { gap: 12px; }
-        .brand-name { font-size: 19px; }
-        .brand small { font-size: 6px; letter-spacing: .25em; }
-        .menu { display: block; cursor: pointer; padding: 8px; }
-        .mobile-menu { position: fixed; top: 64px; left: 16px; right: 16px; z-index: 60; display: grid; gap: 4px; padding: 12px; background: rgba(4,19,13,.97); border: 1px solid rgba(255,255,255,.12); border-radius: 14px; box-shadow: 0 18px 50px rgba(0,0,0,.28); }
-        .mobile-menu a { color: white; padding: 12px 10px; border-radius: 9px; font-weight: 700; }
-        .mobile-menu a:hover { background: rgba(255,255,255,.08); }
-        .hero { min-height: 760px; }
-        .hero-grid { padding: 125px 0 54px; }
-        .hero h1 { font-size: clamp(44px, 9vw, 68px); }
-        .hero-copy { font-size: 15px; max-width: 600px; }
-        .hero-search { width: min(620px,100%); }
-        .hero-bg { transform: scale(1.025); }
-        .section { padding: 88px 0; }
-        .story-grid { gap: 44px; }
-        .story-visual { min-height: 420px; }
-        .search-layout { gap: 38px; }
-        .contact-main h2 { max-width: 700px; }
-        .reveal, .reveal-left, .reveal-right { transform: translateY(18px); transition-duration: .5s; }
+        .nav-inner { min-height: 48px; }
+        .nav .menu { display: none; }
+        .mobile-menu-button { display: inline-flex; }
+        .mobile-menu { display: none; position: absolute; top: 100%; left: 16px; right: 16px; padding: 12px; border-radius: 18px; background: rgba(8,31,21,.96); box-shadow: 0 18px 40px rgba(0,0,0,.22); }
+        .mobile-menu.open { display: grid; gap: 6px; }
+        .mobile-menu a { display:block; padding: 11px 12px; border-radius: 12px; color: white; }
+        .hero { min-height: 650px; }
+        .hero-grid { grid-template-columns: 1fr; }
+        .hero-side { max-width: 520px; }
+        .reveal { transform: translateY(18px); }
+        .reveal-left, .reveal-right { transform: translateY(18px); }
       }
       @media (max-width: 620px) {
-        .container, .hero-grid { width: calc(100% - 28px); }
-        .brand-ball { width: 34px; height: 34px; font-size: 17px; }
-        .brand-name { font-size: 18px; }
-        .hero { min-height: 720px; align-items: center; }
-        .hero-grid { padding: 100px 0 36px; }
-        .hero h1 { font-size: clamp(42px, 13vw, 58px); letter-spacing: -.055em; }
-        .hero-copy { font-size: 14px; line-height: 1.6; }
-        .hero-search { margin-top: 25px; padding: 6px; border-radius: 14px; }
-        .hero-search .search-part { padding: 10px 11px; }
-        .search-button { width: 100%; padding: 13px 16px; }
-        .section { padding: 68px 0; }
-        .section-title { font-size: clamp(34px, 10vw, 46px); }
-        .section-head { margin-bottom: 30px; }
-        .story-visual { min-height: 330px; }
-        .story-tag { left: 18px; bottom: 18px; }
-        .story-tag strong { font-size: 22px; }
-        .story-copy p { font-size: 15px; line-height: 1.75; }
-        .filter-strip { display: grid; grid-template-columns: 1fr; }
-        .filter-strip select { width: 100%; }
-        .count { margin-left: 0; }
-        .search-form { padding: 18px; }
-        .configured { margin-top: 18px; padding-top: 18px; }
-        .modal { padding: 10px; align-items: flex-end; }
-        .modal-card { width: 100%; max-height: 94vh; padding: 22px 18px; border-radius: 18px 18px 4px 4px; }
-        .payments { grid-template-columns: 1fr; }
-        .footer { padding: 20px 0; }
+        .container, .hero-grid { width: min(100% - 24px, 1180px); }
+        .brand { font-size: 1.05rem; }
+        .hero { min-height: 720px; padding-top: 100px; }
+        .hero h1 { font-size: clamp(2.35rem, 13vw, 4rem); line-height: .98; }
+        .hero-search { grid-template-columns: 1fr; gap: 10px; }
+        .hero-search button { width: 100%; }
+        .filter-grid { grid-template-columns: 1fr; }
+        .search-form { grid-template-columns: 1fr; }
+        .modal-panel { width: 100%; max-width: none; margin-top: auto; border-radius: 24px 24px 0 0; }
+        .payment-options { grid-template-columns: 1fr; }
+        .footer-grid { grid-template-columns: 1fr; }
         .hero-bg { transform: scale(1.02); }
       }
       @media (prefers-reduced-motion: reduce) {
-        .reveal, .reveal-left, .reveal-right { transition: none !important; transform: none !important; }
+        .reveal, .reveal-left, .reveal-right, .hero-bg { transition: none !important; transform: none !important; }
       }
     `;
     document.head.appendChild(style);
+    document.querySelectorAll('.reveal, .reveal-left, .reveal-right').forEach(el => el.classList.add('opacity-0'));
+    if ('IntersectionObserver' in window) {
+      const observer = new IntersectionObserver(entries => entries.forEach(entry => {
+        if (!entry.isIntersecting) return;
+        entry.target.classList.remove('opacity-0');
+        entry.target.style.transform = 'translate3d(0,0,0)';
+        observer.unobserve(entry.target);
+      }), { threshold: .12, rootMargin: '0px 0px -40px 0px' });
+      document.querySelectorAll('.reveal, .reveal-left, .reveal-right').forEach(el => observer.observe(el));
+    } else document.querySelectorAll('.reveal, .reveal-left, .reveal-right').forEach(el => el.classList.remove('opacity-0'));
 
-    const menuButton = document.querySelector('.menu');
     const nav = document.querySelector('.nav');
-    if (menuButton && nav && !document.querySelector('.mobile-menu')) {
-      const mobileMenu = document.createElement('nav');
-      mobileMenu.className = 'mobile-menu';
-      mobileMenu.hidden = true;
-      mobileMenu.innerHTML = '<a href="#accueil">Accueil</a><a href="#terrains">Terrains</a><a href="#recherche">Réservations</a><a href="#apropos">À propos</a><a href="#contact">Contact</a>';
-      nav.after(mobileMenu);
-      menuButton.addEventListener('click', () => { mobileMenu.hidden = !mobileMenu.hidden; menuButton.setAttribute('aria-expanded', String(!mobileMenu.hidden)); });
-      mobileMenu.querySelectorAll('a').forEach(link => link.addEventListener('click', () => { mobileMenu.hidden = true; }));
+    if (nav) window.addEventListener('scroll', () => nav.classList.toggle('scrolled', window.scrollY > 18), { passive: true });
+    const menu = document.querySelector('.nav .menu');
+    if (nav && menu && !document.querySelector('.mobile-menu-button')) {
+      const button = document.createElement('button');
+      button.type = 'button'; button.className = 'mobile-menu-button hidden items-center justify-center rounded-xl border border-white/20 px-3 py-2 text-white';
+      button.setAttribute('aria-label','Ouvrir le menu'); button.textContent = '☰';
+      nav.querySelector('.nav-inner')?.appendChild(button);
+      const mobile = document.createElement('div'); mobile.className='mobile-menu';
+      mobile.innerHTML=[...menu.querySelectorAll('a')].map(a=>`<a href="${a.getAttribute('href') || '#'}">${escapeHtml(a.textContent.trim())}</a>`).join('');
+      nav.appendChild(mobile);
+      button.addEventListener('click',()=>mobile.classList.toggle('open'));
+      mobile.querySelectorAll('a').forEach(a=>a.addEventListener('click',()=>mobile.classList.remove('open')));
     }
+    const bg = document.querySelector('.hero-bg');
+    if (bg) window.addEventListener('scroll', () => { if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return; bg.style.transform = `scale(1.025) translateY(${Math.min(window.scrollY * .05, 18)}px)`; }, { passive: true });
   }
 
-  document.addEventListener('DOMContentLoaded', () => { installHomepageMotionAndResponsive(); initDate(); loadTerrains().catch(error => console.error(error)); });
-  if (document.readyState !== 'loading') { installHomepageMotionAndResponsive(); initDate(); loadTerrains().catch(error => console.error(error)); }
+  installHomepageMotionAndResponsive();
+  initDate();
+  loadTerrains().catch(error => { console.error(error); const host=document.querySelector('#terrainResults'); if(host) host.innerHTML='<div class="md:col-span-2 lg:col-span-3 rounded-2xl bg-red-50 p-6 text-sm text-red-700">Impossible de charger les terrains. Vérifiez que le serveur backend est démarré.</div>'; });
 })();
