@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Admin — Terrains Foot</title>
+  <link rel="stylesheet" href="admin.css">
+</head>
+<body>
+  <main class="shell">
+    <section id="loginView" class="card login-card">
+      <div class="brand">⚽ Terrain Foot</div>
+      <h1>Administration</h1>
+      <p class="muted">Connectez-vous avec votre compte administrateur.</p>
+      <form id="loginForm">
+        <label>Email<input id="email" type="email" required autocomplete="username"></label>
+        <label>Mot de passe<input id="password" type="password" required autocomplete="current-password"></label>
+        <button type="submit">Se connecter</button>
+        <p id="loginError" class="error"></p>
+      </form>
+    </section>
+
+    <section id="dashboardView" hidden>
+      <header class="topbar">
+        <div><div class="brand">⚽ Terrain Foot</div><span id="welcome" class="muted"></span></div>
+        <button id="logoutBtn" class="ghost">Déconnexion</button>
+      </header>
+
+      <div class="stats">
+        <article class="card stat"><span>Total terrains</span><strong id="totalStat">0</strong></article>
+        <article class="card stat"><span>Actifs</span><strong id="activeStat">0</strong></article>
+        <article class="card stat"><span>Inactifs</span><strong id="inactiveStat">0</strong></article>
+      </div>
+
+      <section class="card table-card">
+        <div class="section-head"><div><h2>Terrains</h2><p class="muted">Gérez les terrains enregistrés sur la plateforme.</p></div><button id="addBtn">+ Ajouter un terrain</button></div>
+        <div id="message" class="message"></div>
+        <div class="table-wrap">
+          <table><thead><tr><th>Terrain</th><th>Localisation</th><th>Type</th><th>Propriétaire</th><th>Statut</th><th>Actions</th></tr></thead>
+          <tbody id="terrainRows"></tbody></table>
+        </div>
+      </section>
+    </section>
+  </main>
+
+  <dialog id="terrainDialog">
+    <form method="dialog" id="terrainForm" class="dialog-card">
+      <div class="section-head"><div><h2 id="dialogTitle">Ajouter un terrain</h2><p class="muted">Les terrains sont créés uniquement depuis cet espace.</p></div><button type="button" id="closeDialog" class="icon">×</button></div>
+      <input id="terrainId" type="hidden">
+      <div class="grid">
+        <label>Nom *<input id="name" required maxlength="150"></label>
+        <label>Type *<input id="type" value="5x5" required maxlength="50"></label>
+        <label>Adresse *<input id="address" required maxlength="255"></label>
+        <label>Quartier *<input id="quartier" required maxlength="100" placeholder="Almadies"></label>
+        <label>Ville *<input id="city" value="Dakar" required maxlength="100"></label>
+        <label>Capacité<input id="capacity" type="number" min="1"></label>
+        <label>Téléphone<input id="phone" maxlength="30"></label>
+        <label>Image (URL)<input id="image" maxlength="500"></label>
+        <label>Latitude<input id="latitude" type="number" step="any"></label>
+        <label>Longitude<input id="longitude" type="number" step="any"></label>
+        <label>Propriétaire / manager (ID)<input id="owner_id" type="number" min="1"></label>
+        <label>Statut<select id="status"><option value="active">Actif</option><option value="inactive">Inactif</option></select></label>
+      </div>
+      <label>Description<textarea id="description" rows="4" maxlength="5000"></textarea></label>
+      <p id="formError" class="error"></p>
+      <div class="dialog-actions"><button type="button" id="cancelBtn" class="ghost">Annuler</button><button type="submit">Enregistrer</button></div>
+    </form>
+  </dialog>
+  <script src="admin.js"></script>
+</body>
+</html>
