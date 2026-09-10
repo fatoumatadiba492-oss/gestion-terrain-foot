@@ -168,7 +168,7 @@
     const daySlots = (terrain?.slots || []).filter(s => Number(s.day_of_week) === day && s.is_active !== false);
     result.className='mt-5 rounded-xl border border-slate-200 bg-white p-4 text-sm'; result.classList.remove('hidden');
     result.innerHTML = daySlots.length ? `<div class="font-semibold text-slate-800">Créneaux proposés pour cette date</div><div class="mt-3 grid gap-2 sm:grid-cols-2">${daySlots.map((s,i)=>`<button type="button" class="flex items-center justify-between rounded-xl border border-slate-200 p-3 text-left hover:border-grass-500" data-search-slot="${i}"><span>${formatTime(s.start_time)} - ${formatTime(s.end_time)}</span><strong class="text-grass-700">${formatPrice(s.price)}</strong></button>`).join('')}</div>` : '<span class="text-slate-500">Aucun créneau n’est configuré pour ce jour.</span>';
-    result.querySelectorAll('[data-search-slot]').forEach(button=>button.addEventListener('click',()=>{const s=daySlots[Number(button.dataset.searchSlot)];chosenDate=date;chosenTime=`${String(s.start_time).slice(0,5)}-${String(s.end_time).slice(0,5)}`;chosenAmount=Number(s.price);showBookingIfAvailable();}));
+    result.querySelectorAll('[data-search-slot]').forEach(button => button.addEventListener('click',()=>{const s=daySlots[Number(button.dataset.searchSlot)];chosenDate=date;chosenTime=`${String(s.start_time).slice(0,5)}-${String(s.end_time).slice(0,5)}`;chosenAmount=Number(s.price);showBookingIfAvailable();}));
   });
 
   document.querySelector('#customDate')?.addEventListener('change', () => { chosenDate = document.querySelector('#customDate').value || null; renderTerrainSlots(); });
@@ -179,6 +179,89 @@
     const today=new Date(); const value=new Date(today.getTime()-today.getTimezoneOffset()*60000).toISOString().slice(0,10); input.min=value; if(!input.value) input.value=value;
   }
 
-  document.addEventListener('DOMContentLoaded', () => { initDate(); loadTerrains().catch(error => console.error(error)); });
-  if (document.readyState !== 'loading') { initDate(); loadTerrains().catch(error => console.error(error)); }
+  function installHomepageMotionAndResponsive() {
+    const style = document.createElement('style');
+    style.textContent = `
+      /* Motion refinement: calm, short and intentional. */
+      .reveal { transform: translateY(22px); transition: opacity .55s ease, transform .55s ease; }
+      .reveal-left { transform: translateX(-28px); }
+      .reveal-right { transform: translateX(28px); }
+      .delay-1 { transition-delay: .06s; }
+      .delay-2 { transition-delay: .12s; }
+      .delay-3 { transition-delay: .18s; }
+      .hero-bg { transform: scale(1.025); }
+      .hero-side { transform: none; }
+      @media (max-width: 900px) {
+        .container, .hero-grid { width: min(100% - 32px, 1180px); }
+        .nav { padding: 12px 0; }
+        .nav-inner { gap: 12px; }
+        .brand-name { font-size: 19px; }
+        .brand small { font-size: 6px; letter-spacing: .25em; }
+        .menu { display: block; cursor: pointer; padding: 8px; }
+        .mobile-menu { position: fixed; top: 64px; left: 16px; right: 16px; z-index: 60; display: grid; gap: 4px; padding: 12px; background: rgba(4,19,13,.97); border: 1px solid rgba(255,255,255,.12); border-radius: 14px; box-shadow: 0 18px 50px rgba(0,0,0,.28); }
+        .mobile-menu a { color: white; padding: 12px 10px; border-radius: 9px; font-weight: 700; }
+        .mobile-menu a:hover { background: rgba(255,255,255,.08); }
+        .hero { min-height: 760px; }
+        .hero-grid { padding: 125px 0 54px; }
+        .hero h1 { font-size: clamp(44px, 9vw, 68px); }
+        .hero-copy { font-size: 15px; max-width: 600px; }
+        .hero-search { width: min(620px,100%); }
+        .hero-bg { transform: scale(1.025); }
+        .section { padding: 88px 0; }
+        .story-grid { gap: 44px; }
+        .story-visual { min-height: 420px; }
+        .search-layout { gap: 38px; }
+        .contact-main h2 { max-width: 700px; }
+        .reveal, .reveal-left, .reveal-right { transform: translateY(18px); transition-duration: .5s; }
+      }
+      @media (max-width: 620px) {
+        .container, .hero-grid { width: calc(100% - 28px); }
+        .brand-ball { width: 34px; height: 34px; font-size: 17px; }
+        .brand-name { font-size: 18px; }
+        .hero { min-height: 720px; align-items: center; }
+        .hero-grid { padding: 100px 0 36px; }
+        .hero h1 { font-size: clamp(42px, 13vw, 58px); letter-spacing: -.055em; }
+        .hero-copy { font-size: 14px; line-height: 1.6; }
+        .hero-search { margin-top: 25px; padding: 6px; border-radius: 14px; }
+        .hero-search .search-part { padding: 10px 11px; }
+        .search-button { width: 100%; padding: 13px 16px; }
+        .section { padding: 68px 0; }
+        .section-title { font-size: clamp(34px, 10vw, 46px); }
+        .section-head { margin-bottom: 30px; }
+        .story-visual { min-height: 330px; }
+        .story-tag { left: 18px; bottom: 18px; }
+        .story-tag strong { font-size: 22px; }
+        .story-copy p { font-size: 15px; line-height: 1.75; }
+        .filter-strip { display: grid; grid-template-columns: 1fr; }
+        .filter-strip select { width: 100%; }
+        .count { margin-left: 0; }
+        .search-form { padding: 18px; }
+        .configured { margin-top: 18px; padding-top: 18px; }
+        .modal { padding: 10px; align-items: flex-end; }
+        .modal-card { width: 100%; max-height: 94vh; padding: 22px 18px; border-radius: 18px 18px 4px 4px; }
+        .payments { grid-template-columns: 1fr; }
+        .footer { padding: 20px 0; }
+        .hero-bg { transform: scale(1.02); }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        .reveal, .reveal-left, .reveal-right { transition: none !important; transform: none !important; }
+      }
+    `;
+    document.head.appendChild(style);
+
+    const menuButton = document.querySelector('.menu');
+    const nav = document.querySelector('.nav');
+    if (menuButton && nav && !document.querySelector('.mobile-menu')) {
+      const mobileMenu = document.createElement('nav');
+      mobileMenu.className = 'mobile-menu';
+      mobileMenu.hidden = true;
+      mobileMenu.innerHTML = '<a href="#accueil">Accueil</a><a href="#terrains">Terrains</a><a href="#recherche">Réservations</a><a href="#apropos">À propos</a><a href="#contact">Contact</a>';
+      nav.after(mobileMenu);
+      menuButton.addEventListener('click', () => { mobileMenu.hidden = !mobileMenu.hidden; menuButton.setAttribute('aria-expanded', String(!mobileMenu.hidden)); });
+      mobileMenu.querySelectorAll('a').forEach(link => link.addEventListener('click', () => { mobileMenu.hidden = true; }));
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', () => { installHomepageMotionAndResponsive(); initDate(); loadTerrains().catch(error => console.error(error)); });
+  if (document.readyState !== 'loading') { installHomepageMotionAndResponsive(); initDate(); loadTerrains().catch(error => console.error(error)); }
 })();
