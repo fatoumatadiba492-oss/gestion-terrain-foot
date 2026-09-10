@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ReservationController;
 use App\Http\Controllers\TerrainController;
 use Illuminate\Support\Facades\Route;
@@ -7,6 +8,10 @@ use Illuminate\Support\Facades\Route;
 Route::view('/', 'welcome');
 
 Route::prefix('api')->middleware('throttle:30,1')->group(function () {
+    Route::post('/auth/login', [AuthController::class, 'login'])
+        ->middleware('throttle:5,1')
+        ->name('auth.login');
+
     Route::get('/terrains', [TerrainController::class, 'index'])
         ->name('terrains.index');
     Route::get('/terrains/{terrain}', [TerrainController::class, 'show'])
@@ -17,13 +22,20 @@ Route::prefix('api')->middleware('throttle:30,1')->group(function () {
     Route::post('/reservations', [ReservationController::class, 'store'])
         ->name('reservations.store');
 
-    Route::middleware(['auth:sanctum', 'admin'])->prefix('admin')->group(function () {
-        Route::post('/terrains', [TerrainController::class, 'store'])
-            ->name('admin.terrains.store');
-        Route::put('/terrains/{terrain}', [TerrainController::class, 'update'])
-            ->name('admin.terrains.update');
-        Route::delete('/terrains/{terrain}', [TerrainController::class, 'destroy'])
-            ->name('admin.terrains.destroy');
+    Route::middleware('api.token')->group(function () {
+        Route::get('/auth/me', [AuthController::class, 'me'])
+            ->name('auth.me');
+        Route::post('/auth/logout', [AuthController::class, 'logout'])
+            ->name('auth.logout');
+
+        Route::middleware('admin')->prefix('admin')->group(function () {
+            Route::post('/terrains', [TerrainController::class, 'store'])
+                ->name('admin.terrains.store');
+            Route::put('/terrains/{terrain}', [TerrainController::class, 'update'])
+                ->name('admin.terrains.update');
+            Route::delete('/terrains/{terrain}', [TerrainController::class, 'destroy'])
+                ->name('admin.terrains.destroy');
+        });
     });
 });
 
