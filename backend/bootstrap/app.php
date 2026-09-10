@@ -3,6 +3,7 @@
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
+use App\Http\Middleware\AuthenticateApiToken;
 use App\Http\Middleware\EnsureAdmin;
 use App\Http\Middleware\VerifyScannerToken;
 
@@ -14,6 +15,7 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->alias([
+            'api.token' => AuthenticateApiToken::class,
             'admin' => EnsureAdmin::class,
             'scanner.token' => VerifyScannerToken::class,
         ]);
