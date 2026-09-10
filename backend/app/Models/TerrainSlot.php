@@ -5,7 +5,6 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class TerrainSlot extends Model
 {
@@ -27,10 +26,5 @@ class TerrainSlot extends Model
     public function terrain(): BelongsTo
     {
         return $this->belongsTo(Terrain::class);
-    }
-
-    public function reservations(): HasMany
-    {
-        return $this->hasMany(Reservation::class, 'terrain_id', 'terrain_id');
     }
 }
