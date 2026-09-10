@@ -43,8 +43,14 @@
     city.innerHTML = '<option value="">Toutes les villes</option>' + [...new Set(terrains.map(t => t.city).filter(Boolean))].sort().map(v => `<option value="${escapeHtml(v)}">${escapeHtml(v)}</option>`).join('');
     city.value = [...city.options].some(o => o.value === currentCity) ? currentCity : '';
     updateQuartierOptions();
-    city.addEventListener('change', () => { updateQuartierOptions(); renderTerrains(); populateTerrainSelect(); });
-    quartier.addEventListener('change', () => { renderTerrains(); populateTerrainSelect(); });
+    if (!city.dataset.bound) {
+      city.addEventListener('change', () => { updateQuartierOptions(); populateTerrainSelect(); renderTerrains(); renderTerrainSlots(); });
+      city.dataset.bound = '1';
+    }
+    if (!quartier.dataset.bound) {
+      quartier.addEventListener('change', () => { populateTerrainSelect(); renderTerrains(); renderTerrainSlots(); });
+      quartier.dataset.bound = '1';
+    }
   }
 
   function updateQuartierOptions() {
@@ -72,6 +78,17 @@
     if (previous && list.some(t => Number(t.id) === Number(previous))) select.value = String(previous);
     else if (list.length === 1) { selectedTerrainId = Number(list[0].id); select.value = String(selectedTerrainId); }
     else selectedTerrainId = select.value ? Number(select.value) : null;
+    if (!select.dataset.bound) {
+      select.addEventListener('change', () => {
+        selectedTerrainId = select.value ? Number(select.value) : null;
+        chosenTime = null;
+        chosenAmount = null;
+        renderTerrainSlots();
+        const result = document.querySelector('#customSearchResult');
+        if (result) result.classList.add('hidden');
+      });
+      select.dataset.bound = '1';
+    }
   }
 
   function renderTerrains() {
@@ -100,16 +117,15 @@
     if (!host) return;
     const terrain = terrains.find(t => Number(t.id) === Number(selectedTerrainId));
     if (!terrain) { host.innerHTML = '<p class="text-sm text-slate-500 sm:col-span-2">Sélectionnez un terrain pour voir ses créneaux.</p>'; return; }
-    slots = (terrain.slots || []).filter(s => s.is_active !== false);
-    const dayNames = ['','Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi','Dimanche'];
-    host.innerHTML = slots.length ? slots.map((s, i) => `<button type="button" class="slot-enter flex items-center justify-between gap-4 rounded-xl border border-slate-200 bg-white p-4 text-left hover:border-grass-500" data-slot-index="${i}"><span><strong class="block text-slate-900">${dayNames[Number(s.day_of_week)] || 'Jour'}</strong><span class="text-sm text-slate-500">${formatTime(s.start_time)} - ${formatTime(s.end_time)}</span></span><strong class="text-grass-700">${formatPrice(s.price)}</strong></button>`).join('') : '<p class="text-sm text-slate-500 sm:col-span-2">Aucun créneau configuré par l’administration pour ce terrain.</p>';
+    const date = document.querySelector('#customDate')?.value;
+    const selectedDay = date ? (new Date(`${date}T12:00:00`).getDay() || 7) : null;
+    slots = (terrain.slots || []).filter(s => s.is_active !== false && (!selectedDay || Number(s.day_of_week) === selectedDay));
+    host.innerHTML = slots.length ? slots.map((s, i) => `<button type="button" class="slot-enter flex items-center justify-between gap-4 rounded-xl border border-slate-200 bg-white p-4 text-left hover:border-grass-500" data-slot-index="${i}"><span><strong class="block text-slate-900">${selectedDay ? 'Créneau disponible' : ['','Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi','Dimanche'][Number(s.day_of_week)] || 'Jour'}</strong><span class="text-sm text-slate-500">${formatTime(s.start_time)} - ${formatTime(s.end_time)}</span></span><strong class="text-grass-700">${formatPrice(s.price)}</strong></button>`).join('') : `<p class="text-sm text-slate-500 sm:col-span-2">${selectedDay ? 'Aucun créneau configuré pour cette date.' : 'Aucun créneau configuré par l’administration pour ce terrain.'}</p>`;
     host.querySelectorAll('[data-slot-index]').forEach(button => button.addEventListener('click', () => {
-      const date = document.querySelector('#customDate')?.value;
+      const dateValue = document.querySelector('#customDate')?.value;
       const s = slots[Number(button.dataset.slotIndex)];
-      if (!date) { showError('Choisissez d’abord une date.'); return; }
-      const selectedDay = new Date(`${date}T12:00:00`).getDay() || 7;
-      if (Number(s.day_of_week) !== selectedDay) { showError('Ce créneau est configuré pour un autre jour. Choisissez une date correspondante.'); return; }
-      chosenDate = date; chosenTime = `${String(s.start_time).slice(0,5)}-${String(s.end_time).slice(0,5)}`; chosenAmount = Number(s.price); showBookingIfAvailable();
+      if (!dateValue) { showError('Choisissez d’abord une date.'); return; }
+      chosenDate = dateValue; chosenTime = `${String(s.start_time).slice(0,5)}-${String(s.end_time).slice(0,5)}`; chosenAmount = Number(s.price); showBookingIfAvailable();
     }));
   }
 
@@ -145,6 +161,7 @@
     event.preventDefault(); event.stopImmediatePropagation(); errorBox.hidden = true;
     const date = document.querySelector('#customDate').value;
     const result = document.querySelector('#customSearchResult');
+    if (!date) { result.className='mt-5 rounded-xl border border-orange-200 bg-orange-50 p-4 text-sm text-orange-800'; result.textContent='Choisissez une date.'; result.classList.remove('hidden'); return; }
     if (!selectedTerrainId) { result.className='mt-5 rounded-xl border border-orange-200 bg-orange-50 p-4 text-sm text-orange-800'; result.textContent='Choisissez un terrain.'; result.classList.remove('hidden'); return; }
     const terrain = terrains.find(t => Number(t.id) === Number(selectedTerrainId));
     const day = new Date(`${date}T12:00:00`).getDay() || 7;
@@ -154,6 +171,7 @@
     result.querySelectorAll('[data-search-slot]').forEach(button=>button.addEventListener('click',()=>{const s=daySlots[Number(button.dataset.searchSlot)];chosenDate=date;chosenTime=`${String(s.start_time).slice(0,5)}-${String(s.end_time).slice(0,5)}`;chosenAmount=Number(s.price);showBookingIfAvailable();}));
   });
 
+  document.querySelector('#customDate')?.addEventListener('change', () => { chosenDate = document.querySelector('#customDate').value || null; renderTerrainSlots(); });
   if (bookingForm) bookingForm.addEventListener('submit', submitReservation, true);
 
   function initDate() {
